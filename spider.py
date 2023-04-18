@@ -6,7 +6,7 @@
 #    By: tvillare <tvillare@student.42madrid.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/18 12:14:58 by tvillare          #+#    #+#              #
-#    Updated: 2023/04/18 13:23:59 by tvillare         ###   ########.fr        #
+#    Updated: 2023/04/18 13:27:06 by tvillare         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -98,4 +98,5 @@ else:
 	nivel = 0
 page = requests.get(org)
 soup = BeautifulSoup(page.content, "html.parser")
+blacklist.append(org)
 find_url(soup, org, nivel, blacklist, args.p)
