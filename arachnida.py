@@ -6,7 +6,7 @@
 #    By: tvillare <tvillare@student.42madrid.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/17 13:09:09 by tvillare          #+#    #+#              #
-#    Updated: 2023/04/17 17:04:53 by tvillare         ###   ########.fr        #
+#    Updated: 2023/04/18 11:57:21 by tvillare         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,6 +17,21 @@ import unicodedata
 import time
 
 
+import requests
+import os
+from bs4 import BeautifulSoup
+import unicodedata
+import time
+import argparse
+parser = argparse.ArgumentParser(description='es recursibo.')
+parser.add_argument('-r', metavar="", type=int, default=5,
+					help='busqueda en subniveles')
+parser.add_argument('-l', metavar="", type=int, default=5,
+					help='Cantidad de subniveles debusqueda')
+parser.add_argument('-P [PATH]', metavar="", type=str, default="Data",
+					help='Path para guardar imagenes (defecto ./Data)')
+#args = parser.parse_args()
+#print(args.accumulate(args.integers))
 def	pull_img(imgs):
 	for url in imgs:
 		img_url= (url.get( 'src' ))
@@ -39,41 +54,28 @@ def	pull_img(imgs):
 			except:
 				print(tmp, "\n", name[-1])
 
-
-def	find_url(soup, org):
+def	find_url(soup, org, nivel, blacklist):
 	url = soup.find_all("a")
 	imgs = soup.find_all("img")
 	pull_img(imgs)
-	blacklist = []
+	#blacklist = []
 	for link in url:
 		try:
 			link_url = (link.get( 'href' ))
-			if (org in link_url) and (org != link_url) and not(link_url in blacklist):
-				print("-->",link_url)
+			if (org in link_url) and (org != link_url) and not(link_url in blacklist) and (nivel > 0):
+				print("-->",link_url, " ", nivel, "from", org)
 				blacklist.append(link_url)
 				#print("-->",link_url, "\n", link)
 				tmp_page = requests.get(link_url)
 				tmp_soup = BeautifulSoup(tmp_page.content, "html.parser")
-				find_url(tmp_soup, link_url)
+				find_url(tmp_soup, link_url, nivel - 1, blacklist)
 		except:
 			continue
-
-
 if not os.path.exists('img'):
 	os.mkdir("img")
 blacklist = []
-org = "https://www.42barcelona.com/es"
-print("-->",org)
+org = "https://www.42madrid.com"
+nivel = 0
 page = requests.get(org)
 soup = BeautifulSoup(page.content, "html.parser")
-#blacklist.append(url)
-find_url(soup, org)
-
-#imgs = soup.find_all("img")
-#print(imgs, sep="\n")
-#pull_img(imgs)
-#urllib.request.urlretrieve(img_url,nom_img)
-#print("----------------")
-#url = soup.find_all("a")
-#print(*url, sep="\n")
-
+find_url(soup, org, nivel, blacklist)
