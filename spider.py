@@ -6,11 +6,12 @@
 #    By: tvillare <tvillare@student.42madrid.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/18 12:14:58 by tvillare          #+#    #+#              #
-#    Updated: 2023/04/18 13:27:06 by tvillare         ###   ########.fr        #
+#    Updated: 2023/04/18 16:04:11 by tvillare         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 import requests
+from urllib.parse import urlparse
 import os
 from bs4 import BeautifulSoup
 import unicodedata
@@ -43,7 +44,8 @@ extenciones =  ["jpg", "jpeg", "png", "gif", "bmp"]
 
 def	pull_img(imgs, path):
 	for url in imgs:
-		img_url= (url.get( 'src' ))
+		#img_url= (url.get( 'src' ))
+		img_url = url
 		if (len(img_url) > 2):
 			try:
 				name = img_url.split("/")
@@ -65,30 +67,45 @@ def	pull_img(imgs, path):
 				print(tmp, "\n", name[-1])
 
 
+def	create_list_img(soup):
+	imgs = soup.find_all("img")
+	imges = soup.find_all("image")
+	lista = []
+	for x in imgs:
+		lista.append(x.get( 'src' ))
+	for x in imges:
+		lista.append(x.get( 'href' ))
+	#print(lista)
+	return (lista)
+
 def	find_url(soup, org, nivel, blacklist, path):
 	url = soup.find_all("a")
-	imgs = soup.find_all("img")
+	imgs = create_list_img(soup)
 	pull_img(imgs, path)
 	for link in url:
 		try:
+
 			link_url = (link.get( 'href' ))
 			if (org in link_url) and (org != link_url) and not(link_url in blacklist) and (nivel > 0):
 				print("-->",link_url)
 				blacklist.append(link_url)
 				#print("-->",link_url, "\n", link)
-				tmp_page = requests.get(link_url)
-				tmp_soup = BeautifulSoup(tmp_page.content, "html.parser")
-				find_url(tmp_soup, link_url, nivel - 1, blacklist, path)
+				try:
+					tmp_page = requests.get(link_url)
+					tmp_soup = BeautifulSoup(tmp_page.content, "html.parser")
+					find_url(tmp_soup, link_url, nivel - 1, blacklist, path)
+				except:
+					print("Enlace roto!!")
 		except:
-			continue
+			##print("ERRROR-->",link)
 
 
 
 if not os.path.exists(args.p):
 	os.mkdir(args.p)
 blacklist = []
-#TODO = añadir http si no esta
-if args.url.startswith('https://') or args.url.startswith('http://'):
+#TODO = anadir http si no esta
+if args.url.startswith('https://') or args.url.startswith('http://') or args.url.startswith('file://'):
 	org = args.url
 else:
 	org = "https://" + args.url
@@ -97,6 +114,8 @@ if args.r:
 else:
 	nivel = 0
 page = requests.get(org)
+dominio = urlparse(org).netloc
+print(dominio)
 soup = BeautifulSoup(page.content, "html.parser")
 blacklist.append(org)
-find_url(soup, org, nivel, blacklist, args.p)
+find_url(soup, dominio, nivel, blacklist, args.p)
