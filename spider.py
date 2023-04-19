@@ -6,17 +6,9 @@
 #    By: tvillare <tvillare@student.42madrid.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/18 12:14:58 by tvillare          #+#    #+#              #
-#    Updated: 2023/04/18 19:14:01 by tvillare         ###   ########.fr        #
+#    Updated: 2023/04/19 12:20:59 by tvillare         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
-
-import requests
-from urllib.parse import urlparse
-import os
-from bs4 import BeautifulSoup
-import unicodedata
-import time
-
 
 import requests
 import os
@@ -26,7 +18,7 @@ import time
 import argparse
 import re
 
-
+#TODO = usar pambien enlace link
 parser = argparse.ArgumentParser(description='Web scraping, consige TODAS las fotos de una web indicando los subniveles')
 parser.add_argument('url',
 					help='enlace de busqueda')
@@ -49,9 +41,8 @@ parser.add_argument('-P', '--PATH',
 					default="./data",
 					dest='p',
 					help='Path para guardar imagenes (defecto ./Data)')
+
 args = parser.parse_args()
-
-
 
 extenciones =  ["jpg", "jpeg", "png", "gif", "bmp"]
 
@@ -72,15 +63,23 @@ def	pull_img(imgs, path):
 						for chunk in respuesta.iter_content(chunk_size=8192):
 							archivo.write(chunk)
 			except:
-				print(tmp, "\n", name[-1])
+				print("ERORR img")
 
 
 def	create_list_img(soup):
 	imgs = soup.find_all("img")
 	imges = soup.find_all("image")
 	lista = []
+	tmp = []
 	for x in imgs:
 		lista.append(x.get( 'src' ))
+	for x in imgs:
+		e = (x.get( 'srcset' ))
+		if (e != None):
+			#a = re.sub(r'-\d+w(\.\w+)$', r'\1', e)
+			a = e.split(" ")[0]
+			lista.append(a)
+			#print(a)
 	for x in imges:
 		lista.append(x.get( 'href' ))
 	#print(lista)
@@ -122,28 +121,40 @@ def find_url(soup, org, nivel, blacklist, path, back):
 		except:
 			continue
 
+def level(l, r):
+	if r:
+		nivel = l
+	else:
+		nivel = 0
+	if nivel < 0:
+		nive = 0
+	return nivel
+
 
 if not os.path.exists(args.p):
 	os.mkdir(args.p)
 
 blacklist = []
 
-if args.url.startswith('https://') or args.url.startswith('http://') or args.url.startswith('file://'):
+if args.url.startswith('https://'):
 	org = args.url
+	dominio = args.url.replace("https://", "")
+elif args.url.startswith('http://'):
+	org = args.url
+	dominio = args.url.replace("http://", "")
+elif args.url.startswith('file://'):
+	org = args.url
+	dominio = args.url.replace("file://", "")
 else:
 	org = "https://" + args.url
-if args.r:
-	nivel = args.l
-else:
-	nivel = 0
+	dominio = args.url
 
-if (nivel < 0):
-	nive = 0
+nivel = level(args.l, args.r)
 
 page = requests.get(org)
-dominio = urlparse(org).netloc
-print(dominio)
+#dominio = urlparse(org).netloc
+print
 soup = BeautifulSoup(page.content, "html.parser")
-blacklist.append(dominio)
-print(nivel)
+blacklist.append(org)
+print("Hola")
 find_url(soup, dominio, nivel, blacklist, args.p, org)
