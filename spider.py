@@ -6,7 +6,7 @@
 #    By: tvillare <tvillare@student.42madrid.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/18 12:14:58 by tvillare          #+#    #+#              #
-#    Updated: 2023/04/19 12:22:43 by tvillare         ###   ########.fr        #
+#    Updated: 2023/04/19 13:08:55 by tvillare         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -112,12 +112,12 @@ def find_url(soup, org, nivel, blacklist, path, back):
 			link_url = (link.get( 'href' ))
 			link_url = is_dominio(org, link_url, back)
 
-			if (org in link_url) and not(link_url in blacklist) and (nivel > 0):
+			if (org in link_url) and not(link_url in blacklist) and (nivel > 1):
 				print("-->",link_url)
 				blacklist.append(link_url)
 				tmp_page = requests.get(link_url)
 				tmp_soup = BeautifulSoup(tmp_page.content, "html.parser")
-				find_url(tmp_soup, org, nivel - 1, blacklist, path, link_url)
+				find_url(tmp_soup, org, (nivel - 1), blacklist, path, link_url)
 		except:
 			continue
 
@@ -125,9 +125,9 @@ def level(l, r):
 	if r:
 		nivel = l
 	else:
-		nivel = 0
+		nivel = 1
 	if nivel < 0:
-		nive = 0
+		nive = 1
 	return nivel
 
 
