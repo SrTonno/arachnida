@@ -6,7 +6,7 @@
 #    By: tvillare <tvillare@student.42madrid.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/18 12:14:58 by tvillare          #+#    #+#              #
-#    Updated: 2023/04/19 12:20:59 by tvillare         ###   ########.fr        #
+#    Updated: 2023/04/19 12:22:43 by tvillare         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -150,11 +150,11 @@ else:
 	dominio = args.url
 
 nivel = level(args.l, args.r)
-
-page = requests.get(org)
-#dominio = urlparse(org).netloc
-print
-soup = BeautifulSoup(page.content, "html.parser")
-blacklist.append(org)
-print("Hola")
-find_url(soup, dominio, nivel, blacklist, args.p, org)
+try:
+	page = requests.get(org)
+	#dominio = urlparse(org).netloc
+	soup = BeautifulSoup(page.content, "html.parser")
+	blacklist.append(org)
+	find_url(soup, dominio, nivel, blacklist, args.p, org)
+except:
+	print("ERRORO enlace roto")
