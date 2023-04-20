@@ -6,7 +6,7 @@
 #    By: tvillare <tvillare@student.42madrid.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/18 12:14:58 by tvillare          #+#    #+#              #
-#    Updated: 2023/04/19 13:08:55 by tvillare         ###   ########.fr        #
+#    Updated: 2023/04/20 15:51:28 by tvillare         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -49,8 +49,8 @@ extenciones =  ["jpg", "jpeg", "png", "gif", "bmp"]
 def	pull_img(imgs, path):
 	for url in imgs:
 		img_url = url
-		if (len(img_url) > 2):
-			try:
+		try:
+			if (len(img_url) > 2):
 				name = img_url.split("/")
 				if (len(name[-1]) < 0):
 					return
@@ -62,8 +62,8 @@ def	pull_img(imgs, path):
 					with open(nom_img, "wb") as archivo:
 						for chunk in respuesta.iter_content(chunk_size=8192):
 							archivo.write(chunk)
-			except:
-				print("ERORR img")
+		except:
+				continue
 
 
 def	create_list_img(soup):
@@ -127,7 +127,7 @@ def level(l, r):
 	else:
 		nivel = 1
 	if nivel < 0:
-		nive = 1
+		nivel = 1
 	return nivel
 
 
