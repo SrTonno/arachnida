@@ -6,7 +6,7 @@
 #    By: tvillare <tvillare@student.42madrid.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/18 12:14:58 by tvillare          #+#    #+#              #
-#    Updated: 2023/04/20 15:51:28 by tvillare         ###   ########.fr        #
+#    Updated: 2023/05/26 16:54:51 by tvillare         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -127,7 +127,8 @@ def level(l, r):
 	else:
 		nivel = 1
 	if nivel < 0:
-		nivel = 1
+		print("Error: Nivel invalido")
+		sys.exit(0)
 	return nivel
 
 
